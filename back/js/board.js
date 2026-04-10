@@ -1,5 +1,57 @@
 import { grid } from "./cat.js";
 import "./cells.js"; 
+import { robotinhovermelho, robotinhoVerde } from "./entities.js";
+import { basequadverde,basequadvermelho,basetriaverde,basetriavermelho } from "./entities.js";
+function drawRobots(ctx, cellSize) {
+  const robots = [robotinhovermelho, robotinhoVerde];
+  const robotRadius = cellSize / 3.5;
+  
+  robots.forEach(robot => {
+    const centerX = robot.col * cellSize + cellSize / 2;
+    const centerY = robot.row * cellSize + cellSize / 2;
+    
+    ctx.fillStyle = robot.color;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, robotRadius, 0, Math.PI * 2);
+    ctx.fill();
+  });
+}
+
+function drawBases(ctx, cellSize) {
+  const bases = [
+    basequadverde,
+    basequadvermelho,
+    basetriaverde,
+    basetriavermelho
+  ];
+
+  const size = cellSize / 2.5;
+
+  bases.forEach(base => {
+    const centerX = base.col * cellSize + cellSize / 2;
+    const centerY = base.row * cellSize + cellSize / 2;
+
+    ctx.fillStyle = base.color;
+
+    if (base.format === "quadrado") {
+      ctx.fillRect(
+        centerX - size / 2,
+        centerY - size / 2,
+        size,
+        size
+      );
+    }
+    if (base.format === "triangulo") {
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY - size / 2); // topo
+      ctx.lineTo(centerX - size / 2, centerY + size / 2); // esquerda
+      ctx.lineTo(centerX + size / 2, centerY + size / 2); // direita
+      ctx.closePath();
+      ctx.fill();
+    }
+  });
+}
+
 
 function draw() {
   const canvas = document.getElementById("toy-canvas");
@@ -37,6 +89,9 @@ function draw() {
       if (cell.right) ctx.fillRect(x + cellSize - wallThickness, y, wallThickness, cellSize);
     }
   }
+
+  drawRobots(ctx, cellSize);
+  drawBases(ctx,cellSize);
 }
 
 
