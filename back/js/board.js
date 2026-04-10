@@ -1,7 +1,10 @@
 import { grid } from "./cat.js";
 import "./cells.js"; 
+import "./movement.js";
 import { robotinhovermelho, robotinhoVerde } from "./entities.js";
 import { basequadverde,basequadvermelho,basetriaverde,basetriavermelho } from "./entities.js";
+
+
 function drawRobots(ctx, cellSize) {
   const robots = [robotinhovermelho, robotinhoVerde];
   const robotRadius = cellSize / 3.5;
@@ -96,3 +99,6 @@ function draw() {
 
 
 window.addEventListener('load', draw);
+
+// Redraw quando o robô se mover
+window.addEventListener('robotMoved', draw);

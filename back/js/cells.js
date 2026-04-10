@@ -38,3 +38,7 @@ setWallRight(2, 7);
 
 // centro
 setCenter(4, 4);
+setWallBottom(3, 4);  
+setWallTop(5, 4);    
+setWallRight(4, 3);  
+setWallLeft(4, 5);    
