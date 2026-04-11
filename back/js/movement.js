@@ -1,34 +1,59 @@
 import { grid } from "./cat.js";
-import { robotinhovermelho, robotinhoVerde, basetriaverde, basetriavermelho } from "./entities.js";
+import { robotinhovermelho, robotinhoVerde, basequadverde, basequadvermelho } from "./entities.js";
+
+const robots = [robotinhovermelho, robotinhoVerde];
 
 // Função para mover o robô (desliza até encostar numa barreira) - COM ANIMAÇÃO
 async function moveRobot(robot, direction) {
-  const DELAY = 5; // milliseconds entre cada célula
+  const DELAY = 15;
   let moved = false;
 
   if (direction === "up") {
-    while (robot.row > 0 && !grid[robot.row][robot.col].top && !(robot.row === 4 && robot.col === 4)) {
+    while (
+      robot.row > 0 &&
+      !grid[robot.row][robot.col].top &&
+      !(robot.row === 4 && robot.col === 4) &&
+      !hasRobot(robot.row - 1, robot.col, robot) // 👈 AQUI
+    ) {
       robot.row--;
       moved = true;
       window.dispatchEvent(new Event("robotMoved"));
       await new Promise(resolve => setTimeout(resolve, DELAY));
     }
+
   } else if (direction === "down") {
-    while (robot.row < 8 && !grid[robot.row][robot.col].bottom && !(robot.row === 4 && robot.col === 4)) {
+    while (
+      robot.row < 8 &&
+      !grid[robot.row][robot.col].bottom &&
+      !(robot.row === 4 && robot.col === 4) &&
+      !hasRobot(robot.row + 1, robot.col, robot) // 👈 AQUI
+    ) {
       robot.row++;
       moved = true;
       window.dispatchEvent(new Event("robotMoved"));
       await new Promise(resolve => setTimeout(resolve, DELAY));
     }
+
   } else if (direction === "left") {
-    while (robot.col > 0 && !grid[robot.row][robot.col].left && !(robot.row === 4 && robot.col === 4)) {
+    while (
+      robot.col > 0 &&
+      !grid[robot.row][robot.col].left &&
+      !(robot.row === 4 && robot.col === 4) &&
+      !hasRobot(robot.row, robot.col - 1, robot) // 👈 AQUI
+    ) {
       robot.col--;
       moved = true;
       window.dispatchEvent(new Event("robotMoved"));
       await new Promise(resolve => setTimeout(resolve, DELAY));
     }
+
   } else if (direction === "right") {
-    while (robot.col < 8 && !grid[robot.row][robot.col].right && !(robot.row === 4 && robot.col === 4)) {
+    while (
+      robot.col < 8 &&
+      !grid[robot.row][robot.col].right &&
+      !(robot.row === 4 && robot.col === 4) &&
+      !hasRobot(robot.row, robot.col + 1, robot) // 👈 AQUI
+    ) {
       robot.col++;
       moved = true;
       window.dispatchEvent(new Event("robotMoved"));
@@ -44,68 +69,138 @@ async function moveRobot(robot, direction) {
   return moved;
 }
 
-// BFS para encontrar caminho mais curto (considerando deslizamento)
-function bfs(robot, targetBase) {
-  const queue = [[robot.row, robot.col, 0]]; // [row, col, steps]
-  const visited = new Set();
-  visited.add(`${robot.row},${robot.col}`);
+function slidePosition(row, col, direction, blockRow, blockCol) {
+  let newRow = row;
+  let newCol = col;
 
-  const directions = [
-    { name: "up", dr: -1, dc: 0 },
-    { name: "down", dr: 1, dc: 0 },
-    { name: "left", dr: 0, dc: -1 },
-    { name: "right", dr: 0, dc: 1 }
-  ];
+  const isBlocked = (nextRow, nextCol) => nextRow === blockRow && nextCol === blockCol;
 
-  while (queue.length > 0) {
-    const [row, col, steps] = queue.shift();
-
-    // Verificar se chegou na base
-    if (row === targetBase.row && col === targetBase.col) {
-      console.log(`✅ Base encontrada! Passos: ${steps}`);
-      return steps;
+  if (direction === "up") {
+    while (
+      newRow > 0 &&
+      !grid[newRow][newCol].top &&
+      !(newRow === 4 && newCol === 4) &&
+      !isBlocked(newRow - 1, newCol)
+    ) {
+      newRow--;
     }
 
-    // Explorar todas as direções de deslizamento
-    for (const dir of directions) {
-      let newRow = row;
-      let newCol = col;
+  } else if (direction === "down") {
+    while (
+      newRow < 8 &&
+      !grid[newRow][newCol].bottom &&
+      !(newRow === 4 && newCol === 4) &&
+      !isBlocked(newRow + 1, newCol)
+    ) {
+      newRow++;
+    }
 
-      // Deslizar na direção até encostar numa barreira ou centro
-      if (dir.name === "up") {  
-        while (newRow > 0 && !grid[newRow][newCol].top) {
-          newRow--;
-        }
-      } else if (dir.name === "down") {
-        while (newRow < 8 && !grid[newRow][newCol].bottom) {
-          newRow++;
-        }
-      } else if (dir.name === "left") {
-        while (newCol > 0 && !grid[newRow][newCol].left) {
-          newCol--;
-        }
-      } else if (dir.name === "right") {
-        while (newCol < 8 && !grid[newRow][newCol].right) {
-          newCol++;
-        }
+  } else if (direction === "left") {
+    while (
+      newCol > 0 &&
+      !grid[newRow][newCol].left &&
+      !(newRow === 4 && newCol === 4) &&
+      !isBlocked(newRow, newCol - 1)
+    ) {
+      newCol--;
+    }
+
+  } else if (direction === "right") {
+    while (
+      newCol < 8 &&
+      !grid[newRow][newCol].right &&
+      !(newRow === 4 && newCol === 4) &&
+      !isBlocked(newRow, newCol + 1)
+    ) {
+      newCol++;
+    }
+  }
+
+  return { row: newRow, col: newCol };
+}
+
+function getRectangularBaseForRobot(robot) {
+  return robot.color === "red" ? basequadvermelho : basequadverde;
+}
+
+function hasRobot(row, col, ignoreRobot) {
+  return robots.some(r => r !== ignoreRobot && r.row === row && r.col === col);
+}
+
+// BFS no estado conjunto (vermelho + verde), permitindo usar o robô auxiliar
+function bfs(robot, targetBase) {
+  const queue = [[robotinhovermelho.row, robotinhovermelho.col, robotinhoVerde.row, robotinhoVerde.col, []]];
+  const visited = new Set();
+  visited.add(`${robotinhovermelho.row},${robotinhovermelho.col}|${robotinhoVerde.row},${robotinhoVerde.col}`);
+
+  const directions = ["up", "down", "left", "right"];
+  const targetIsRed = robot.color === "red";
+
+  while (queue.length > 0) {
+    const [redRow, redCol, greenRow, greenCol, path] = queue.shift();
+
+    const targetRow = targetIsRed ? redRow : greenRow;
+    const targetCol = targetIsRed ? redCol : greenCol;
+
+    if (targetRow === targetBase.row && targetCol === targetBase.col) {
+      console.log(`✅ Base encontrada! Passos: ${path.length}`);
+      return path;
+    }
+
+    for (const movingColor of ["red", "green"]) {
+      for (const dir of directions) {
+        const movingRed = movingColor === "red";
+
+        const moverRow = movingRed ? redRow : greenRow;
+        const moverCol = movingRed ? redCol : greenCol;
+        const blockerRow = movingRed ? greenRow : redRow;
+        const blockerCol = movingRed ? greenCol : redCol;
+
+        const next = slidePosition(moverRow, moverCol, dir, blockerRow, blockerCol);
+
+        if (next.row === moverRow && next.col === moverCol) continue;
+
+        const nextRedRow = movingRed ? next.row : redRow;
+        const nextRedCol = movingRed ? next.col : redCol;
+        const nextGreenRow = movingRed ? greenRow : next.row;
+        const nextGreenCol = movingRed ? greenCol : next.col;
+
+        const stateKey = `${nextRedRow},${nextRedCol}|${nextGreenRow},${nextGreenCol}`;
+        if (visited.has(stateKey)) continue;
+
+        visited.add(stateKey);
+        queue.push([
+          nextRedRow,
+          nextRedCol,
+          nextGreenRow,
+          nextGreenCol,
+          [...path, { robot: movingColor, direction: dir }]
+        ]);
       }
-
-      // Se não se moveu, pula
-      if (newRow === row && newCol === col) continue;
-
-      // Se tentou ir para o centro, pula (não pode passar)
-      if (newRow === 4 && newCol === 4) continue;
-
-      // Se já visitou, pula
-      if (visited.has(`${newRow},${newCol}`)) continue;
-
-      visited.add(`${newRow},${newCol}`);
-      queue.push([newRow, newCol, steps + 1]);
     }
   }
 
   console.log("❌ Base não alcançável!");
-  return -1;
+  return null;
+}
+
+async function moveRobotByBfs(robot) {
+  const targetBase = getRectangularBaseForRobot(robot);
+  console.log(`\n🤖 Calculando caminho para base retangular ${targetBase.color}...`);
+
+  const path = bfs(robot, targetBase);
+  if (!path) {
+    console.log("❌ Não foi possível encontrar caminho.");
+    return false;
+  }
+
+  console.log(`📊 Caminho encontrado com ${path.length} movimentos (incluindo robô auxiliar).`);
+  for (const step of path) {
+    const movingRobot = step.robot === "red" ? robotinhovermelho : robotinhoVerde;
+    await moveRobot(movingRobot, step.direction);
+  }
+
+  return true;
 }
 
 // Controles do teclado
@@ -147,22 +242,32 @@ document.addEventListener("keydown", async (e) => {
     }
   }
 
-  // B para calcular BFS até base de triângulo
+  // B para calcular e executar BFS até base retangular da mesma cor
   if (e.key === "b" || e.key === "B") {
-    let targetBase = activeRobot.color === "red" ? basetriavermelho : basetriaverde;
-    console.log(`\n🤖 Calculando caminho mais curto para base de ${targetBase.color}...`);
-    const steps = bfs(activeRobot, targetBase);
-    if (steps !== -1) {
-      console.log(`📊 Resultado: ${steps} passos até a base de triângulo de ${targetBase.color}!`);
-    }
+    if (isMoving) return;
+    isMoving = true;
+    await moveRobotByBfs(activeRobot);
+    isMoving = false;
   }
 });
+
+const solveButton = document.getElementById("solve-btn");
+if (solveButton) {
+  solveButton.addEventListener("click", async () => {
+    if (isMoving) return;
+    isMoving = true;
+    solveButton.disabled = true;
+    await moveRobotByBfs(activeRobot);
+    solveButton.disabled = false;
+    isMoving = false;
+  });
+}
 
 console.log("✅ Sistema de movimentação carregado!");
 console.log("🔴 Robô Vermelho selecionado por padrão");
 console.log("🎮 Controles:");
 console.log("  ⬆️⬇️⬅️➡️  = Mover robô");
 console.log("  R = Trocar robô");
-console.log("  B = Calcular BFS");
+console.log("  B = Resolver para base retangular da cor do robô");
 
-export { moveRobot, bfs, activeRobot };
+export { moveRobot, bfs, activeRobot, moveRobotByBfs };

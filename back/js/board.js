@@ -4,14 +4,136 @@ import "./movement.js";
 import { robotinhovermelho, robotinhoVerde } from "./entities.js";
 import { basequadverde,basequadvermelho,basetriaverde,basetriavermelho } from "./entities.js";
 
+const GRID_SIZE = 9;
+const CELL_SIZE = 67;
+const ROBOT_RADIUS = CELL_SIZE / 3.5;
+
+let draggingRobot = null;
+let dragPointerX = null;
+let dragPointerY = null;
+let dragOffsetX = 0;
+let dragOffsetY = 0;
+
+function getCanvasCoordinates(canvas, event) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+
+  return {
+    x: (event.clientX - rect.left) * scaleX,
+    y: (event.clientY - rect.top) * scaleY
+  };
+}
+
+function getRobotAtPosition(x, y) {
+  const robots = [robotinhovermelho, robotinhoVerde];
+
+  for (const robot of robots) {
+    const centerX = robot.col * CELL_SIZE + CELL_SIZE / 2;
+    const centerY = robot.row * CELL_SIZE + CELL_SIZE / 2;
+    const dx = x - centerX;
+    const dy = y - centerY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance <= ROBOT_RADIUS) {
+      return robot;
+    }
+  }
+
+  return null;
+}
+
+function isCellOccupied(row, col, robotToIgnore) {
+  const robots = [robotinhovermelho, robotinhoVerde];
+  return robots.some(robot => robot !== robotToIgnore && robot.row === row && robot.col === col);
+}
+
+// função para mover uma entidade segurando e arrastando
+function setupDragAndDrop() {
+  const canvas = document.getElementById("toy-canvas");
+  if (!canvas) return;
+
+  canvas.addEventListener("pointerdown", (event) => {
+    const point = getCanvasCoordinates(canvas, event);
+    const robot = getRobotAtPosition(point.x, point.y);
+    if (!robot) return;
+
+    draggingRobot = robot;
+    const centerX = robot.col * CELL_SIZE + CELL_SIZE / 2;
+    const centerY = robot.row * CELL_SIZE + CELL_SIZE / 2;
+    dragOffsetX = centerX - point.x;
+    dragOffsetY = centerY - point.y;
+    dragPointerX = point.x + dragOffsetX;
+    dragPointerY = point.y + dragOffsetY;
+    canvas.style.cursor = "grabbing";
+
+    canvas.setPointerCapture(event.pointerId);
+    draw();
+  });
+
+  canvas.addEventListener("pointermove", (event) => {
+    if (!draggingRobot) return;
+
+    const point = getCanvasCoordinates(canvas, event);
+    dragPointerX = point.x + dragOffsetX;
+    dragPointerY = point.y + dragOffsetY;
+    draw();
+  });
+
+  canvas.addEventListener("pointerup", (event) => {
+    if (!draggingRobot) return;
+
+    const point = getCanvasCoordinates(canvas, event);
+    const previewX = point.x + dragOffsetX;
+    const previewY = point.y + dragOffsetY;
+    const col = Math.max(0, Math.min(GRID_SIZE - 1, Math.floor(previewX / CELL_SIZE)));
+    const row = Math.max(0, Math.min(GRID_SIZE - 1, Math.floor(previewY / CELL_SIZE)));
+
+    const isCenterCell = row === 4 && col === 4;
+    const occupied = isCellOccupied(row, col, draggingRobot);
+
+    if (!isCenterCell && !occupied) {
+      draggingRobot.row = row;
+      draggingRobot.col = col;
+      window.dispatchEvent(new Event("robotMoved"));
+    }
+
+    if (canvas.hasPointerCapture(event.pointerId)) {
+      canvas.releasePointerCapture(event.pointerId);
+    }
+
+    canvas.style.cursor = "default";
+    dragPointerX = null;
+    dragPointerY = null;
+    dragOffsetX = 0;
+    dragOffsetY = 0;
+    draggingRobot = null;
+    draw();
+  });
+
+  canvas.addEventListener("pointercancel", () => {
+    canvas.style.cursor = "default";
+    dragPointerX = null;
+    dragPointerY = null;
+    dragOffsetX = 0;
+    dragOffsetY = 0;
+    draggingRobot = null;
+    draw();
+  });
+}
+
 
 function drawRobots(ctx, cellSize) {
   const robots = [robotinhovermelho, robotinhoVerde];
-  const robotRadius = cellSize / 3.5;
+  const robotRadius = ROBOT_RADIUS;
   
   robots.forEach(robot => {
-    const centerX = robot.col * cellSize + cellSize / 2;
-    const centerY = robot.row * cellSize + cellSize / 2;
+    const centerX = robot === draggingRobot && dragPointerX !== null
+      ? dragPointerX
+      : robot.col * cellSize + cellSize / 2;
+    const centerY = robot === draggingRobot && dragPointerY !== null
+      ? dragPointerY
+      : robot.row * cellSize + cellSize / 2;
     
     ctx.fillStyle = robot.color;
     ctx.beginPath();
@@ -60,15 +182,15 @@ function draw() {
   const canvas = document.getElementById("toy-canvas");
   if (!canvas) return console.log("ERRO AO RENDERIZAR CANVAS"); 
   const ctx = canvas.getContext("2d");
-  const cellSize = 67; 
+  const cellSize = CELL_SIZE; 
   const wallThickness = 5;
 
 
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  for (let row = 0; row < 9; row++) {
-    for (let col = 0; col < 9; col++) {
+  for (let row = 0; row < GRID_SIZE; row++) {
+    for (let col = 0; col < GRID_SIZE; col++) {
       const cell = grid[row][col];
       const x = col * cellSize;
       const y = row * cellSize;
@@ -99,6 +221,7 @@ function draw() {
 
 
 window.addEventListener('load', draw);
+window.addEventListener('load', setupDragAndDrop);
 
 // Redraw quando o robô se mover
 window.addEventListener('robotMoved', draw);
