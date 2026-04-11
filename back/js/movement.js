@@ -2,8 +2,44 @@ import { grid } from "./cat.js";
 import { robotinhovermelho, robotinhoVerde, basequadverde, basequadvermelho } from "./entities.js";
 
 const robots = [robotinhovermelho, robotinhoVerde];
+let isAutoCounting = false;
+let autoMoveCount = 0;
+const moveCounterValueElement = document.getElementById("move-counter-value");
+const initialRobotState = {
+  red: { row: robotinhovermelho.row, col: robotinhovermelho.col },
+  green: { row: robotinhoVerde.row, col: robotinhoVerde.col }
+};
 
-// Função para mover o robô (desliza até encostar numa barreira) - COM ANIMAÇÃO
+function updateMoveCounter() {
+  if (moveCounterValueElement) {
+    moveCounterValueElement.textContent = String(autoMoveCount);
+  }
+}
+
+
+function resetMoveCounter() {
+  autoMoveCount = 0;
+  updateMoveCounter();
+}
+
+function resetGameState() {
+  robotinhovermelho.row = initialRobotState.red.row;
+  robotinhovermelho.col = initialRobotState.red.col;
+  robotinhoVerde.row = initialRobotState.green.row;
+  robotinhoVerde.col = initialRobotState.green.col;
+
+  robotinhovermelho.moves = 0;
+  robotinhoVerde.moves = 0;
+
+  activeRobot = robotinhovermelho;
+  isAutoCounting = false;
+  resetMoveCounter();
+
+  window.dispatchEvent(new Event("robotMoved"));
+  console.log("♻️ Partida resetada para o estado inicial.");
+}
+
+// Função para mover o robô (desliza até encostar numa barreira)
 async function moveRobot(robot, direction) {
   const DELAY = 15;
   let moved = false;
@@ -13,7 +49,7 @@ async function moveRobot(robot, direction) {
       robot.row > 0 &&
       !grid[robot.row][robot.col].top &&
       !(robot.row === 4 && robot.col === 4) &&
-      !hasRobot(robot.row - 1, robot.col, robot) // 👈 AQUI
+      !hasRobot(robot.row - 1, robot.col, robot) 
     ) {
       robot.row--;
       moved = true;
@@ -26,7 +62,7 @@ async function moveRobot(robot, direction) {
       robot.row < 8 &&
       !grid[robot.row][robot.col].bottom &&
       !(robot.row === 4 && robot.col === 4) &&
-      !hasRobot(robot.row + 1, robot.col, robot) // 👈 AQUI
+      !hasRobot(robot.row + 1, robot.col, robot) 
     ) {
       robot.row++;
       moved = true;
@@ -39,7 +75,7 @@ async function moveRobot(robot, direction) {
       robot.col > 0 &&
       !grid[robot.row][robot.col].left &&
       !(robot.row === 4 && robot.col === 4) &&
-      !hasRobot(robot.row, robot.col - 1, robot) // 👈 AQUI
+      !hasRobot(robot.row, robot.col - 1, robot) 
     ) {
       robot.col--;
       moved = true;
@@ -52,7 +88,7 @@ async function moveRobot(robot, direction) {
       robot.col < 8 &&
       !grid[robot.row][robot.col].right &&
       !(robot.row === 4 && robot.col === 4) &&
-      !hasRobot(robot.row, robot.col + 1, robot) // 👈 AQUI
+      !hasRobot(robot.row, robot.col + 1, robot) 
     ) {
       robot.col++;
       moved = true;
@@ -62,6 +98,8 @@ async function moveRobot(robot, direction) {
   }
 
   if (moved) {
+    autoMoveCount++;
+    updateMoveCounter();
     robot.moves++;
     console.log(`Robô ${robot.color} move para ${direction}. Posição: [${robot.row}, ${robot.col}]`);
   }
@@ -188,8 +226,12 @@ async function moveRobotByBfs(robot) {
   const targetBase = getRectangularBaseForRobot(robot);
   console.log(`\n🤖 Calculando caminho para base retangular ${targetBase.color}...`);
 
+  resetMoveCounter();
+  isAutoCounting = true;
+
   const path = bfs(robot, targetBase);
   if (!path) {
+    isAutoCounting = false;
     console.log("❌ Não foi possível encontrar caminho.");
     return false;
   }
@@ -199,6 +241,8 @@ async function moveRobotByBfs(robot) {
     const movingRobot = step.robot === "red" ? robotinhovermelho : robotinhoVerde;
     await moveRobot(movingRobot, step.direction);
   }
+
+  isAutoCounting = false;
 
   return true;
 }
@@ -263,6 +307,22 @@ if (solveButton) {
   });
 }
 
+const resetButton = document.getElementById("reset-btn");
+if (resetButton) {
+  resetButton.addEventListener("click", () => {
+    if (isMoving) return;
+    resetGameState();
+  });
+}
+
+const secondResetButton = document.getElementById("reset-btn-2");
+if (secondResetButton) {
+  secondResetButton.addEventListener("click", () => {
+    if (isMoving) return;
+    resetGameState();
+  });
+}
+
 console.log("✅ Sistema de movimentação carregado!");
 console.log("🔴 Robô Vermelho selecionado por padrão");
 console.log("🎮 Controles:");
@@ -270,4 +330,4 @@ console.log("  ⬆️⬇️⬅️➡️  = Mover robô");
 console.log("  R = Trocar robô");
 console.log("  B = Resolver para base retangular da cor do robô");
 
-export { moveRobot, bfs, activeRobot, moveRobotByBfs };
+export { moveRobot, bfs, activeRobot, moveRobotByBfs, resetGameState };

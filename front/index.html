@@ -5,21 +5,104 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ricochet Robots</title>
     <link rel="stylesheet" href="style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jacquard+24&family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <div id="game-layout">
         <header>
-            <h1>Ricochet Robots</h1>
+            <h1 class="ml5">
+                <span class="text-wrapper">
+                    <span class="line line1"></span>
+                    <span class="letters">
+                        <span class="letter-r">R</span><span class="letter-i">i</span>
+                        <span class="letter-r2">R</span><span class="letter-o">o</span><span class="letter-b">b</span><span class="letter-o2">o</span><span class="letter-s">s</span>
+                    </span>
+                    <span class="line line2"></span>
+                </span>
+            </h1>
         </header>
-        
-        <div id="board-container">
-            <canvas id="toy-canvas" width="600" height="600"></canvas>
-        </div>
 
-        <div id="controls">
-            <button id="solve-btn" type="button">Ir para base retangular</button>
+        <div id="main-container">
+            <div id="board-container">
+                <canvas id="toy-canvas" width="600" height="600"></canvas>
+            </div>
+            <div id="huds-container">
+                <div id="controls" class="balatro-hud">
+                  <div class="score-container">
+                      <div class="score-label">PONTUAÇÃO</div>
+                      <div class="score-display">
+                          <span class="pc-score" id="pc-score-value">0</span>
+                          <span class="score-separator">X</span>
+                          <span class="player-score" id="player-score-value">0</span>
+                      </div>
+                  </div>
+
+                  <div id="move-counter" class="balatro-stat-box">
+                      <span class="label">MOVIMENTOS</span>
+                      <span id="move-counter-value">0</span>
+                  </div>
+
+                  <button id="solve-btn" class="balatro-btn" type="button">
+                      REALIZAR MOVIMENTO
+                  </button>
+
+                  <button id="reset-btn-2" class="balatro-btn balatro-btn-reset" type="button">
+                      RESETAR
+                  </button>
+              </div>
+              <div id="objective-card" class="isaac-card balatro-hud">
+        
+                <div class="card-label">OBJETIVO:</div>
+                
+                <div class="card-icon-slot">
+                    <img src="caminho/para/icone_pixelado.png" alt="Ícone Objetivo" class="pixel-icon">
+                </div>
+                
+            </div>
+            </div>
+            
+            
         </div>
     </div>
     <script type="module" src="/back/js/main.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.0.2/anime.min.js"></script>
+
+    <!-- animação do título -->
+    <script>
+        anime.timeline({loop: false})
+            .add({
+                targets: '.ml5 .line',
+                scaleX: [0, 1],
+                opacity: [0.5, 1],
+                easing: "easeInOutExpo",
+                duration: 700
+            })
+            .add({
+                targets: '.ml5 .line',
+                translateY: (el, i) => (-0.6 + 1.2 * i) + "em",
+                easing: "easeOutExpo",
+                duration: 600
+            })
+            .add({
+                targets: '.ml5 .letters',
+                opacity: [0, 1],
+                scale: [0.5, 1],
+                easing: "easeOutExpo",
+                duration: 600,
+                offset: '-=300'
+            });
+    </script>
+
+    <script>
+        window.addEventListener("load", () => {
+            document.querySelector(".balatro-hud").classList.add("loaded");
+        });
+    </script>
+
 </body>
 </html>
