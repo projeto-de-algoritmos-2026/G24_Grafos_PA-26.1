@@ -1,5 +1,6 @@
 import { grid } from "./cat.js";
-import { robotinhovermelho, robotinhoVerde, basequadverde, basequadvermelho } from "./entities.js";
+import { robotinhovermelho, robotinhoVerde, basequadverde, basequadvermelho, basetriaverde, basetriavermelho } from "./entities.js";
+import { objetivo, randomizeObjective } from "./main.js";
 
 const robots = [robotinhovermelho, robotinhoVerde];
 let isAutoCounting = false;
@@ -34,6 +35,7 @@ function resetGameState() {
   activeRobot = robotinhovermelho;
   isAutoCounting = false;
   resetMoveCounter();
+  randomizeObjective();
 
   window.dispatchEvent(new Event("robotMoved"));
   console.log("♻️ Partida resetada para o estado inicial.");
@@ -157,12 +159,19 @@ function slidePosition(row, col, direction, blockRow, blockCol) {
   return { row: newRow, col: newCol };
 }
 
-function getRectangularBaseForRobot(robot) {
-  return robot.color === "red" ? basequadvermelho : basequadverde;
+function getBaseForRobot(robot) {
+  switch (objetivo) {
+    case 1: return basequadvermelho;
+    case 2: return basequadverde;
+    case 3: return basetriavermelho;
+    case 4: return basetriaverde;
+    default: return basequadvermelho; // Fallback
+  }
 }
 
 function hasRobot(row, col, ignoreRobot) {
   return robots.some(r => r !== ignoreRobot && r.row === row && r.col === col);
+  
 }
 
 // BFS no estado conjunto (vermelho + verde), permitindo usar o robô auxiliar
@@ -172,15 +181,14 @@ function bfs(robot, targetBase) {
   visited.add(`${robotinhovermelho.row},${robotinhovermelho.col}|${robotinhoVerde.row},${robotinhoVerde.col}`);
 
   const directions = ["up", "down", "left", "right"];
-  const targetIsRed = robot.color === "red";
-
+  const targetRobotColor = targetBase.color;
   while (queue.length > 0) {
     const [redRow, redCol, greenRow, greenCol, path] = queue.shift();
+    const robotAtTarget = (targetRobotColor === "red") 
+        ? (redRow === targetBase.row && redCol === targetBase.col)
+        : (greenRow === targetBase.row && greenCol === targetBase.col);
 
-    const targetRow = targetIsRed ? redRow : greenRow;
-    const targetCol = targetIsRed ? redCol : greenCol;
-
-    if (targetRow === targetBase.row && targetCol === targetBase.col) {
+    if (robotAtTarget) {
       console.log(`✅ Base encontrada! Passos: ${path.length}`);
       return path;
     }
@@ -223,7 +231,7 @@ function bfs(robot, targetBase) {
 }
 
 async function moveRobotByBfs(robot) {
-  const targetBase = getRectangularBaseForRobot(robot);
+  const targetBase = getBaseForRobot(robot);
   console.log(`\n🤖 Calculando caminho para base retangular ${targetBase.color}...`);
 
   resetMoveCounter();
@@ -290,6 +298,7 @@ document.addEventListener("keydown", async (e) => {
   if (e.key === "b" || e.key === "B") {
     if (isMoving) return;
     isMoving = true;
+    // O robô ativo é passado como referência, mas o BFS usará o 'objetivo' global
     await moveRobotByBfs(activeRobot);
     isMoving = false;
   }

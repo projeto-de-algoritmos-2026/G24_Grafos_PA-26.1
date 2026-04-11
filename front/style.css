@@ -150,9 +150,9 @@ header h1 {
 }
 
 .score-label {
-    color: #4b4b4b;
+    color: #343434;
     font-family: 'Pixelify Sans', sans-serif;
-    font-size: 1.2rem;
+    font-size: 2rem;
     border-bottom: 2px solid #eee;
     margin-bottom: 8px;
 }
@@ -172,7 +172,7 @@ header h1 {
 /* --- MOVIMENTOS --- */
 .balatro-stat-box {
     background: var(--balatro-orange);
-    color: white;
+    color: rgb(255, 255, 255);
     border: 3px solid #000;
     border-radius: 8px;
     padding: 12px;
@@ -309,11 +309,12 @@ header h1 {
 .card-label {
     width: 100%;
     text-align: center;
-    font-size: 1.2rem;
+    font-size: 2rem;
     font-weight: bold;
     text-transform: uppercase;
+    font-family: 'Pixelify Sans', sans-serif;
     letter-spacing: 1px;
-    color: #4b4b4b; /* Cor cinza escura para subtítulo */
+    color: #1f1f1f; /* Cor cinza escura para subtítulo */
     border-bottom: 2px solid #000; /* Linha divisória */
     padding-bottom: 5px;
     margin-bottom: 5px;
@@ -357,6 +358,5 @@ header h1 {
     max-height: 90%;
     object-fit: contain;
     /* Importante para ícones pixelados */
-    image-rendering: pixelated; 
     filter: drop-shadow(2px 2px 0px #000); /* Sombra contorno para ícone */
 }
