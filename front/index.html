@@ -5,19 +5,139 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ricochet Robots</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jacquard+24&family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
 </head>
+
 <body>
+    <div id="modal-overlay"></div>
+    <div id="rules-modal" class="rules-card">
+        <h2>Regras/Como usar</h2>
+        <p>O <span class="letters">
+            <span class="letter-r">R</span><span class="letter-i">i</span>
+            <span class="letter-r2">R</span><span class="letter-o">o</span><span class="letter-b">b</span><span class="letter-o2">o</span><span class="letter-s">s</span>
+        </span> é uma ferramenta/site inspirada no jogo de tabuleiro  <strong>Ricochet Robots</strong> <br> <br>
+            <img id="imgrobots" class="imgrobots" src="../front/assets/71mruABu0GL.jpg" alt="Imagem Jogo"> <br> <br> que permite o usuário visualizar o número mínimo de jogadas/movimentos necessárias para que o robô chegue até sua base de cor correspondente (objetivo) selecionada.</p>
+        
+        <p>É possível movimentar os robôs utilizando seu <strong>mouse!</strong>, criando combinações personalizadas.</p>
+        
+        <button id="close-rules-btn" class="balatro-btn">FECHAR</button>
+    </div>
     <div id="game-layout">
         <header>
-            <h1>Ricochet Robots</h1>
+            <button id="rules-btn" class="box-button">
+                <div class="button">
+                  <span>Regras</span>
+                </div>
+            </button>
+            <h1 class="ml5">
+                <span class="text-wrapper">
+                    <span class="line line1"></span>
+                    <span class="letters">
+                        <span class="letter-r">R</span><span class="letter-i">i</span>
+                        <span class="letter-r2">R</span><span class="letter-o">o</span><span class="letter-b">b</span><span class="letter-o2">o</span><span class="letter-s">s</span>
+                    </span>
+                    <span class="line line2"></span>
+                </span>
+            </h1>
         </header>
+
+        <div id="main-container">
+            <div id="board-container">
+                <canvas id="toy-canvas" width="600" height="600"></canvas>
+            </div>
+            <div id="huds-container">
+                <div id="controls" class="balatro-hud">
+
+                  <div id="move-counter" class="balatro-stat-box">
+                      <span class="label">MOVIMENTOS</span>
+                      <span id="move-counter-value">0</span>
+                  </div>
+
+                  <button id="solve-btn" class="balatro-btn" type="button">
+                      REALIZAR MOVIMENTO
+                  </button>
+
+                  <button id="reset-btn-2" class="balatro-btn balatro-btn-reset" type="button">
+                      RESETAR
+                  </button>
+              </div>
+              <div id="objective-card" class="isaac-card">
         
-        <div id="board-container">
-            <canvas id="toy-canvas" width="600" height="600"></canvas>
+                <div class="card-label">OBJETIVO:</div>
+                
+                <div class="card-icon-slot">
+                    <button id="prev-objective-btn" class="objective-arrow-btn">&lt;</button>
+                    <img id="objective-icon" src="" alt="Ícone Objetivo" class="pixel-icon">
+                    <button id="next-objective-btn" class="objective-arrow-btn">&gt;</button>
+                </div>
+                
+              </div>
+            </div>
+            
+            
         </div>
     </div>
+    <script type="module" src="/back/js/main.js"></script>
 
-    <script src="../back/js/board.js"></script>
-    <script src="../back/js/main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.0.2/anime.min.js"></script>
+
+    <!-- animação do título -->
+    <script>
+        anime.timeline({loop: false})
+            .add({
+                targets: '.ml5 .line',
+                scaleX: [0, 1],
+                opacity: [0.5, 1],
+                easing: "easeInOutExpo",
+                duration: 700
+            })
+            .add({
+                targets: '.ml5 .line',
+                translateY: (el, i) => (-0.6 + 1.2 * i) + "em",
+                easing: "easeOutExpo",
+                duration: 600
+            })
+            .add({
+                targets: '.ml5 .letters',
+                opacity: [0, 1],
+                scale: [0.5, 1],
+                easing: "easeOutExpo",
+                duration: 600,
+                offset: '-=300'
+            });
+    </script>
+
+    <!-- botão regras -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const rulesBtn = document.getElementById('rules-btn');
+            const closeRulesBtn = document.getElementById('close-rules-btn');
+            const rulesModal = document.getElementById('rules-modal');
+            const overlay = document.getElementById('modal-overlay');
+
+            const openModal = () => {
+                rulesModal.style.display = 'flex';
+                overlay.style.display = 'block';
+            };
+
+            const closeModal = () => {
+                rulesModal.style.display = 'none';
+                overlay.style.display = 'none';
+            };
+
+            rulesBtn.addEventListener('click', openModal);
+            closeRulesBtn.addEventListener('click', closeModal);
+            overlay.addEventListener('click', closeModal);
+        });
+    </script>
+
+    <script>
+        window.addEventListener("load", () => {
+            document.querySelector(".balatro-hud").classList.add("loaded");
+        });
+    </script>
+
 </body>
 </html>
