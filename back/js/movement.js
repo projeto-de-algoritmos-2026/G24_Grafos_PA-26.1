@@ -1,5 +1,5 @@
 import { grid } from "./cat.js";
-import { robotinhovermelho, robotinhoVerde,robotinhoAmarelo,robotinhoAzul, basequadverde, basequadvermelho, basetriaverde, basetriavermelho } from "./entities.js";
+import { robotinhovermelho, robotinhoVerde,robotinhoAmarelo,robotinhoAzul, basequadverde, basequadvermelho, basetriaverde, basetriavermelho,basequadamarelo,basetriaazul,basequadazul,basetriamarelo } from "./entities.js";
 import { objetivo } from "./main.js";
 
 const robots = [robotinhovermelho, robotinhoVerde,robotinhoAmarelo,robotinhoAzul];
@@ -225,7 +225,7 @@ function slidePosition(row, col, direction, blockers = []) {
   return { row: newRow, col: newCol };
 }
 
-function getBaseForRobot(robot) {
+function getBaseForRobot() {
   switch (objetivo) {
     case 1: return basequadvermelho;
     case 2: return basequadverde;
@@ -245,7 +245,7 @@ function hasRobot(row, col, ignoreRobot) {
 }
 
 // BFS no estado conjunto (vermelho + verde), permitindo usar o robô auxiliar
-function bfs(robot, targetBase) {
+function bfs(targetBase) {
   const initialPositions = {
     red: { row: robotinhovermelho.row, col: robotinhovermelho.col },
     green: { row: robotinhoVerde.row, col: robotinhoVerde.col },
@@ -254,6 +254,7 @@ function bfs(robot, targetBase) {
   };
 
   const queue = [[initialPositions, []]];
+  const MAX_DEPTH = 30;
   const visited = new Set();
   const robotColors = Object.keys(initialPositions);
   const initialStateKey = robotColors.map(color => `${initialPositions[color].row},${initialPositions[color].col}`).join('|');
@@ -264,6 +265,10 @@ function bfs(robot, targetBase) {
 
   while (queue.length > 0) {
     const [currentPositions, path] = queue.shift();
+
+    if (path.length > MAX_DEPTH) {
+      continue;
+    }
 
     const targetRobotCurrentPos = currentPositions[targetRobotColor];
     if (targetRobotCurrentPos.row === targetBase.row && targetRobotCurrentPos.col === targetBase.col) {
@@ -301,13 +306,13 @@ function bfs(robot, targetBase) {
 }
 
 async function moveRobotByBfs(robot) {
-  const targetBase = getBaseForRobot(robot);
+  const targetBase = getBaseForRobot();
   console.log(`\nCalculando caminho para base retangular ${targetBase.color}...`);
 
   resetMoveCounter();
   isAutoCounting = true;
 
-  const path = bfs(robot, targetBase);
+  const path = bfs(targetBase);
   if (!path) {
     isAutoCounting = false;
     console.log("Não foi possível encontrar caminho.");

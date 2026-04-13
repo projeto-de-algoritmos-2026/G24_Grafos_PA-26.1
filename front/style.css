@@ -31,6 +31,14 @@ body {
 }
 
 /* --- Header e Animação --- */
+header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    position: relative; /* Para posicionar o botão de regras */
+}
+
 header h1 {
     margin: 0;
     font-family: 'Jacquard 24', sans-serif;
@@ -326,6 +334,97 @@ header h1 {
 }
 
 #objective-icon {
-    min-width: 64px; /* Garante que o layout não quebre quando a imagem some */
-    min-height: 64px;
+    width: 128px;
+    height: 128px;
+    min-width: 48px; /* Garante que o layout não quebre quando a imagem some */
+    min-height: 48px;
 }
+
+#imgrobots {
+    display: block;
+    margin: 15px auto;
+    width: 128px;
+    height: 128px;
+    min-width: 48px; /* Garante que o layout não quebre quando a imagem some */
+    min-height: 48px;
+}
+
+.box-button {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    border: 4px solid black;
+    background-color: gray;
+    padding-bottom: 10px;
+    transition: 0.1s ease-in-out;
+    user-select: none;
+  }
+  
+  .button {
+    background-color: #dddddd;
+    border: 4px solid #fff;
+    padding: 3px 8px;
+  }
+  
+  .button span {
+    font-size: 1.2em;
+    letter-spacing: 1px;
+    color: #333;
+  }
+  
+  .box-button:active {
+    padding: 0;
+    margin-bottom: 10px;
+    transform: translateY(calc(-50% + 10px));
+  }
+  
+  /* --- Modal de Regras --- */
+  #modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px);
+      z-index: 999;
+  }
+  
+  .rules-card {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    max-width: 500px;
+    width: 90%;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    background: var(--balatro-white);
+    border: 4px solid #3d4448;
+    border-radius: 12px;
+    box-shadow: 8px 8px 0px rgba(0,0,0,0.15);
+}
+  
+  .rules-card h2 {
+      text-align: center;
+      margin-top: 0;
+      color: var(--wall-color);
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 10px;
+  }
+  
+  .rules-card p {
+      color: #333;
+      line-height: 1.6;
+  }
+  
+  .rules-card #close-rules-btn {
+      margin-top: 15px;
+      background-color: var(--balatro-red);
+  }

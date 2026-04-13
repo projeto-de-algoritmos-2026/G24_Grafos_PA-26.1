@@ -5,15 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ricochet Robots</title>
     <link rel="stylesheet" href="style.css">
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Jacquard+24&family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
 </head>
 
 <body>
+    <div id="modal-overlay"></div>
+    <div id="rules-modal" class="rules-card">
+        <h2>Regras/Como usar</h2>
+        <p>O <span class="letters">
+            <span class="letter-r">R</span><span class="letter-i">i</span>
+            <span class="letter-r2">R</span><span class="letter-o">o</span><span class="letter-b">b</span><span class="letter-o2">o</span><span class="letter-s">s</span>
+        </span> é uma ferramenta/site inspirada no jogo de tabuleiro  <strong>Ricochet Robots</strong> <br> <br>
+            <img id="imgrobots" class="imgrobots" src="../front/assets/71mruABu0GL.jpg" alt="Imagem Jogo"> <br> <br> que permite o usuário visualizar o número mínimo de jogadas/movimentos necessárias para que o robô chegue até sua base de cor correspondente (objetivo) selecionada.</p>
+        
+        <p>É possível movimentar os robôs utilizando seu <strong>mouse!</strong>, criando combinações personalizadas.</p>
+        
+        <button id="close-rules-btn" class="balatro-btn">FECHAR</button>
+    </div>
     <div id="game-layout">
         <header>
+            <button id="rules-btn" class="box-button">
+                <div class="button">
+                  <span>Regras</span>
+                </div>
+            </button>
             <h1 class="ml5">
                 <span class="text-wrapper">
                     <span class="line line1"></span>
@@ -90,6 +107,30 @@
                 duration: 600,
                 offset: '-=300'
             });
+    </script>
+
+    <!-- botão regras -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const rulesBtn = document.getElementById('rules-btn');
+            const closeRulesBtn = document.getElementById('close-rules-btn');
+            const rulesModal = document.getElementById('rules-modal');
+            const overlay = document.getElementById('modal-overlay');
+
+            const openModal = () => {
+                rulesModal.style.display = 'flex';
+                overlay.style.display = 'block';
+            };
+
+            const closeModal = () => {
+                rulesModal.style.display = 'none';
+                overlay.style.display = 'none';
+            };
+
+            rulesBtn.addEventListener('click', openModal);
+            closeRulesBtn.addEventListener('click', closeModal);
+            overlay.addEventListener('click', closeModal);
+        });
     </script>
 
     <script>

@@ -1,9 +1,7 @@
 import "./board.js";
-import { robotinhovermelho } from "./entities.js";
-import { moveRobotByBfs } from "./movement.js";
 
 export let objetivo;
-const MAX_OBJECTIVES = 8; // Total de objetivos (4 quadrados + 4 triângulos)
+const MAX_OBJECTIVES = 8;
 
 export function setObjective(newObjective) {
     objetivo = newObjective;
@@ -12,7 +10,7 @@ export function setObjective(newObjective) {
 }
 
 window.onload = function() {
-    setObjective(0); // Inicia com objetivo 0 (nenhum)
+    setObjective(0); 
 
     const prevBtn = document.getElementById('prev-objective-btn');
     const nextBtn = document.getElementById('next-objective-btn');
@@ -20,7 +18,7 @@ window.onload = function() {
     nextBtn.addEventListener('click', () => {
         let next = objetivo + 1;
         if (next > MAX_OBJECTIVES) {
-            next = 1; // Volta para o primeiro
+            next = 1; 
         }
         setObjective(next);
     });
@@ -28,7 +26,7 @@ window.onload = function() {
     prevBtn.addEventListener('click', () => {
         let prev = objetivo - 1;
         if (prev < 1) {
-            prev = MAX_OBJECTIVES; // Vai para o último
+            prev = MAX_OBJECTIVES; 
         }
         setObjective(prev);
     });
@@ -41,7 +39,7 @@ function updateObjectiveIcon() {
     let iconPath = '';
     switch (objetivo) {
         case 0:
-            iconPath = './assets/questionmark.png';
+            iconPath = './assets/redsquare.png';
             break;
         case 1:
             iconPath = './assets/redsquare.png';
@@ -50,10 +48,10 @@ function updateObjectiveIcon() {
             iconPath = './assets/greensquare.png';
             break;
         case 3:
-            iconPath = './assets/bluesquare.png';
+            iconPath = './assets/yellowsquare.png';
             break;
         case 4:
-            iconPath = './assets/yellowsquare.png';
+            iconPath = './assets/bluesquare.png';
             break;
         case 5:
             iconPath = './assets/redtriangle.png';
