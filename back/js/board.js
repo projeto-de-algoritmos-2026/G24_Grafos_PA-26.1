@@ -1,12 +1,17 @@
 import { grid } from "./cat.js";
 import "./cells.js"; 
 import "./movement.js";
-import { robotinhovermelho, robotinhoVerde } from "./entities.js";
-import { basequadverde,basequadvermelho,basetriaverde,basetriavermelho } from "./entities.js";
+import { robotinhovermelho, robotinhoVerde, robotinhoAmarelo, robotinhoAzul } from "./entities.js";
+import { basequadverde,basequadvermelho,basequadamarelo,basequadazul,basetriaazul,basetriamarelo,basetriaverde,basetriavermelho } from "./entities.js";
 
-const GRID_SIZE = 9;
-const CELL_SIZE = 67;
+const GRID_SIZE = 16;
+const CELL_SIZE = 37.5;
 const ROBOT_RADIUS = CELL_SIZE / 3.5;
+
+function getCssColor(variableName, fallback) {
+  const value = getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
+  return value || fallback;
+}
 
 let draggingRobot = null;
 let dragPointerX = null;
@@ -26,7 +31,7 @@ function getCanvasCoordinates(canvas, event) {
 }
 
 function getRobotAtPosition(x, y) {
-  const robots = [robotinhovermelho, robotinhoVerde];
+  const robots = [robotinhovermelho, robotinhoVerde, robotinhoAzul, robotinhoAmarelo];
 
   for (const robot of robots) {
     const centerX = robot.col * CELL_SIZE + CELL_SIZE / 2;
@@ -44,7 +49,7 @@ function getRobotAtPosition(x, y) {
 }
 
 function isCellOccupied(row, col, robotToIgnore) {
-  const robots = [robotinhovermelho, robotinhoVerde];
+  const robots = [robotinhovermelho, robotinhoVerde, robotinhoAmarelo,robotinhoAzul];
   return robots.some(robot => robot !== robotToIgnore && robot.row === row && robot.col === col);
 }
 
@@ -95,6 +100,8 @@ function setupDragAndDrop() {
     if (!isCenterCell && !occupied) {
       draggingRobot.row = row;
       draggingRobot.col = col;
+      draggingRobot.renderRow = row;
+      draggingRobot.renderCol = col;
       window.dispatchEvent(new Event("robotMoved"));
     }
 
@@ -124,16 +131,18 @@ function setupDragAndDrop() {
 
 
 function drawRobots(ctx, cellSize) {
-  const robots = [robotinhovermelho, robotinhoVerde];
+  const robots = [robotinhovermelho, robotinhoVerde, robotinhoAmarelo, robotinhoAzul];
   const robotRadius = ROBOT_RADIUS;
   
   robots.forEach(robot => {
+    const renderCol = Number.isFinite(robot.renderCol) ? robot.renderCol : robot.col;
+    const renderRow = Number.isFinite(robot.renderRow) ? robot.renderRow : robot.row;
     const centerX = robot === draggingRobot && dragPointerX !== null
       ? dragPointerX
-      : robot.col * cellSize + cellSize / 2;
+      : renderCol * cellSize + cellSize / 2;
     const centerY = robot === draggingRobot && dragPointerY !== null
       ? dragPointerY
-      : robot.row * cellSize + cellSize / 2;
+      : renderRow * cellSize + cellSize / 2;
     
     ctx.fillStyle = robot.color;
     ctx.beginPath();
@@ -145,9 +154,13 @@ function drawRobots(ctx, cellSize) {
 function drawBases(ctx, cellSize) {
   const bases = [
     basequadverde,
+    basequadamarelo,
+    basequadazul,
     basequadvermelho,
     basetriaverde,
-    basetriavermelho
+    basetriavermelho,
+    basetriamarelo,
+    basetriaazul
   ];
 
   const size = cellSize / 2.5;
@@ -184,9 +197,11 @@ function draw() {
   const ctx = canvas.getContext("2d");
   const cellSize = CELL_SIZE; 
   const wallThickness = 5;
+  const boardBgColor = getCssColor("--board-bg", "#ffffff");
+  const gridColor = getCssColor("--grid-color", "#dddddd");
 
 
-  ctx.fillStyle = "#ffffff";
+  ctx.fillStyle = boardBgColor;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   for (let row = 0; row < GRID_SIZE; row++) {
@@ -197,7 +212,7 @@ function draw() {
 
       // grid leve
       ctx.lineWidth = 1;
-      ctx.strokeStyle = "#ddd";
+      ctx.strokeStyle = gridColor;
       ctx.strokeRect(x, y, cellSize, cellSize);
 
       // centro

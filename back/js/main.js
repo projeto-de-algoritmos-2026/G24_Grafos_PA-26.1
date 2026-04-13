@@ -1,16 +1,37 @@
 import "./board.js";
+import { robotinhovermelho } from "./entities.js";
+import { moveRobotByBfs } from "./movement.js";
 
 export let objetivo;
+const MAX_OBJECTIVES = 8; // Total de objetivos (4 quadrados + 4 triângulos)
 
-export function randomizeObjective() {
-    objetivo = Math.floor(Math.random() * 4) + 1;
-    console.log(`Nova base gerada: ${objetivo}`);
-    // Dispara um evento para notificar outros módulos sobre a nova base
+export function setObjective(newObjective) {
+    objetivo = newObjective;
+    console.log(`Base selecionada pelo jogador: ${objetivo}`);
     window.dispatchEvent(new Event('objectiveChanged'));
 }
 
 window.onload = function() {
-    randomizeObjective();
+    setObjective(0); // Inicia com objetivo 0 (nenhum)
+
+    const prevBtn = document.getElementById('prev-objective-btn');
+    const nextBtn = document.getElementById('next-objective-btn');
+
+    nextBtn.addEventListener('click', () => {
+        let next = objetivo + 1;
+        if (next > MAX_OBJECTIVES) {
+            next = 1; // Volta para o primeiro
+        }
+        setObjective(next);
+    });
+
+    prevBtn.addEventListener('click', () => {
+        let prev = objetivo - 1;
+        if (prev < 1) {
+            prev = MAX_OBJECTIVES; // Vai para o último
+        }
+        setObjective(prev);
+    });
 };
 
 function updateObjectiveIcon() {
@@ -19,6 +40,9 @@ function updateObjectiveIcon() {
 
     let iconPath = '';
     switch (objetivo) {
+        case 0:
+            iconPath = './assets/questionmark.png';
+            break;
         case 1:
             iconPath = './assets/redsquare.png';
             break;
@@ -26,17 +50,28 @@ function updateObjectiveIcon() {
             iconPath = './assets/greensquare.png';
             break;
         case 3:
-            iconPath = './assets/redtriangle.png';
+            iconPath = './assets/bluesquare.png';
             break;
         case 4:
+            iconPath = './assets/yellowsquare.png';
+            break;
+        case 5:
+            iconPath = './assets/redtriangle.png';
+            break;
+        case 6:
             iconPath = './assets/greentriangle.png';
             break;
+        case 7:
+            iconPath = './assets/bluetriangle.png';
+            break;
+        case 8:
+            iconPath = './assets/yellowtriangle.png';
+            break;
         default:
-            iconPath = './assets/redsquare.png'; // Fallback
+            iconPath = './assets/questionmark.png'; // Fallback
     }
     iconElement.src = iconPath;
 }
 
 // Atualiza o ícone quando o objetivo muda
 window.addEventListener('objectiveChanged', updateObjectiveIcon);
-
