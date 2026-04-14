@@ -10,16 +10,16 @@
 | 23/1039187  |  Yzabella Miranda Pimenta |
 
 ## Sobre 
-Este projeto implementa busca em grafos BFS sobre um 
+Este projeto implementa busca em grafos com BFS no contexto do jogo Ricochet Robots.
 O objetivo principal é praticar a implementação dos algoritmos ensinados na disciplina de Projeto de Algoritmos aplicando BFS em um grafo de posições, permitindo obter o caminho mínimo de uma configuração dos robôs.
 Tanto o mapa (labirinto) quanto as regras foram tiradas do jogo de tabuleiro oficial Ricochet Robots criado em 1999 https://en.wikipedia.org/wiki/Ricochet_Robots
 
-<!-- O programa recebe dois nomes como entrada (origem e destino), encontra o menor caminho entre eles no grafo e grava a resposta em arquivo, e demonstra em uma interface web interativa para visualizacao do grafo e exploracao das conexoes entre usuarios. -->
+O programa encontra o menor caminho para o robô objetivo alcançar sua base usando BFS, com visualização em uma interface web interativa.
 
-<!-- ## Screenshots
+## Screenshots
 
 <p align="center">
-  <img src="/front/assets/tela_jogo.png" width="800"  alt="Captura de tela da interface principal (jogo)">
+  <img src="front/assets/tela_jogo.png" width="800" alt="Captura de tela da interface principal (jogo)">
   <br>
   <sub>Captura de tela da interface inicial (jogo)</sub>
 </p>
@@ -27,7 +27,7 @@ Tanto o mapa (labirinto) quanto as regras foram tiradas do jogo de tabuleiro ofi
 ---
 
 <p align="center">
-  <img src="/front/assets/card_regras.png" width="800" alt="Captura de tela do card de regras que explica o jogo">
+  <img src="front/assets/card_regras.png" width="800" alt="Captura de tela do card de regras que explica o jogo">
   <br>
   <sub>Captura de tela da aba de regras</sub>
 </p>
@@ -35,30 +35,49 @@ Tanto o mapa (labirinto) quanto as regras foram tiradas do jogo de tabuleiro ofi
 ---
 
 <p align="center">
-<img src="assets/busca.png" width="45%" style="margin-right: 10px;">
-  <img src="assets/apenas_caminho.png" width="45%">
+  <img src="front/assets/movAtualizado.png" width="800" alt="Captura de tela da movimentação e busca no tabuleiro">
   <br>
-  <sub>Visualizacao da busca e do caminho encontrado</sub>
+  <sub>Visualização da busca e do caminho encontrado</sub>
 </p>
 
 
-
-
 ## Instalação 
-**Linguagem**: Python 3<br>
-**Framework**: Nao se aplica<br>
+**Linguagem**: JavaScript, HTML e CSS  
+**Framework**: Não foi utilizado  
+**Pré-requisitos**: Node.js (com npx) e navegador web atualizado
 
+### Como rodar
 
-#### Interface Web 
+1. Clonar o repositório
 
-Foi desenvolvida uma interface interativa para exploração do grafo de usuarios.
+```bash
+git clone https://github.com/projeto-de-algoritmos-2026/G24_Grafos_PA-26.1.git
+cd G24_Grafos_PA-26.1
+```
 
-Tecnologias utilizadas no front-end:
+2. Iniciar o servidor local na raiz do projeto
 
+```bash
+npx serve .
+```
 
-- HTML
-- CSS
-- JavaScript
+3. Abrir no navegador
+
+```txt
+http://localhost:3000/front/index.html
+```
+
+4. Encerrar o servidor quando terminar
+
+```bash
+Ctrl + C
+```
+
+> Alternativa caso prefira outro servidor local:
+>
+> ```bash
+> npx http-server .
+> ```
 
 ## Vídeo de Apresentação
 
@@ -66,5 +85,12 @@ Tecnologias utilizadas no front-end:
   Neste vídeo, apresentaremos o trabalho desenvolvido:
 </p>
 
+<p align="center">
+  <a href="https://youtu.be/GBx2gQw55AY" target="_blank">
+    <img src="https://img.youtube.com/vi/GBx2gQw55AY/maxresdefault.jpg" alt="Assista ao vídeo de apresentação no YouTube" width="800">
+  </a>
+</p>
 
-## Outros  -->
+<p align="center">
+  <a href="https://youtu.be/GBx2gQw55AY">https://youtu.be/GBx2gQw55AY</a>
+</p>
